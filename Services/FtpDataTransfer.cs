@@ -5,16 +5,10 @@ using System.Text;
 
 namespace Red.FTP.Services;
 
-internal class FtpDataTransfer : IFtpDataTransfer
+internal class FtpDataTransfer(IFtpCommandSender _commandSender) : IFtpDataTransfer
 {
     private TcpClient? _dataClient;
     private NetworkStream? _dataStream;
-    private readonly IFtpCommandSender _commandSender;
-
-    public FtpDataTransfer(IFtpCommandSender commandSender)
-    {
-        _commandSender = commandSender;
-    }
 
     public async Task<IEnumerable<FtpFile>> GetFilesAsync(string remotePath)
     {
@@ -35,13 +29,15 @@ internal class FtpDataTransfer : IFtpDataTransfer
 
     private async Task<IEnumerable<FtpFile>> ReadDataResponseAsync()
     {
-        List<FtpFile> dataResponse = new();
+        ArgumentNullException.ThrowIfNull(_dataStream);
+
+        List<FtpFile> dataResponse = [];
         byte[] buffer = new byte[1024];
         int bytesRead;
 
         try
         {
-            while ((bytesRead = await _dataStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while ((bytesRead = await _dataStream.ReadAsync(buffer)) > 0)
             {
                 BuildFtpFile(ref dataResponse, Encoding.ASCII.GetString(buffer, 0, bytesRead));
             }
