@@ -13,25 +13,6 @@ public class FtpClient(string _host) : IFtpClient
     private BasicFtpCredentials? _auth;
     private bool _disposed = false;
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                _controlStream?.Dispose();
-                _controlClient?.Dispose();
-            }
-            _disposed = true;
-        }
-    }
-
     public void SetCredentials(string user, string password) =>
         _auth = new BasicFtpCredentials(user, password);
 
@@ -73,5 +54,24 @@ public class FtpClient(string _host) : IFtpClient
         } while (bytesRead > 0 && !response.ToString().EndsWith("\r\n"));
 
         return response.ToString();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _controlStream?.Dispose();
+                _controlClient?.Dispose();
+            }
+            _disposed = true;
+        }
     }
 }
