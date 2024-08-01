@@ -1,7 +1,9 @@
-﻿namespace Red.FTP.Interfaces;
+﻿using Red.FTP.Models;
+
+namespace Red.FTP.Interfaces;
 
 public interface IFtpClient : IDisposable
 {
-    Task<string> CreateConnectionAsync(string host, int port = 21);
-    Task<string> AuthAsync();
+    Task<FtpResponse> CreateConnectionAsync(string host, int port = 21);
+    Task<FtpResponse> AuthAsync();
 }

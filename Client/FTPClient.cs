@@ -78,7 +78,6 @@ public class FtpClient(IFtpCommand _commands, IFtpDataTransfer _ftpDataTransfer)
         throw new InvalidOperationException("Invalid FTP response format.");
     }
 
-
     public void Dispose()
     {
         Dispose(true);
