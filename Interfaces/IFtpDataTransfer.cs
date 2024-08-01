@@ -2,7 +2,7 @@
 
 namespace Red.FTP.Interfaces;
 
-internal interface IFtpDataTransfer
+public interface IFtpDataTransfer
 {
-    Task<IEnumerable<FtpFile>> GetFilesAsync(string remotePath);
+    Task<IEnumerable<FtpFile>> GetFilesAsync(string remotePath, string ip, int port);
 }
