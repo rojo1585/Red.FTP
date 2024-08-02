@@ -1,6 +1,6 @@
 ﻿namespace Red.FTP.Models;
 
-public class Authentication
+internal class Authentication
 {
     public record BasicFtpCredentials(string User, string Password);
 }

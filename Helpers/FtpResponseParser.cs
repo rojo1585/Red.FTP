@@ -2,7 +2,7 @@
 
 namespace Red.FTP.Helpers;
 
-public static class FtpResponseParser
+internal static class FtpResponseParser
 {
     public static (string, int) ParsePasiveResponse(string response)
     {
