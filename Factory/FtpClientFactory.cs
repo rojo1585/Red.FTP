@@ -9,7 +9,7 @@ public static class FtpClientFactory
     public static FtpClient CreateTcpClient()
     {
         var command = new FtpCommands();
-        var transferData = new FtpDataTransfer(command);
+        var transferData = new FtpActions(command);
         return new FtpClient(command, transferData);
     }
 }

@@ -82,5 +82,17 @@ internal static class FtpStatusCodes
     {
         return AuthenticatedStatusCodes.Contains(statusCode);
     }
+    public static (int statusCode, string description) GetStatusCodeAndMessage(string response)
+    {
+        if (response.Length < 3)
+            throw new InvalidOperationException("Invalid FTP response format.");
 
+        if (int.TryParse(response.AsSpan(0, 3), out int statusCode))
+        {
+            string message = FtpStatusCodes.GetStatusCodeDescription(statusCode);
+            return (statusCode, message);
+        }
+
+        throw new InvalidOperationException("Invalid FTP response format.");
+    }
 }
