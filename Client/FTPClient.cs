@@ -15,7 +15,6 @@ public class FtpClient(IFtpCommand _commands, IFtpDataTransfer _ftpDataTransfer)
     private bool _disposed = false;
     private bool isLogin = false;
 
-
     public void SetCredentials(string user, string password) =>
         _auth = new BasicFtpCredentials(user, password);
 
@@ -26,7 +25,7 @@ public class FtpClient(IFtpCommand _commands, IFtpDataTransfer _ftpDataTransfer)
         _commands.SetNetworkStream(_controlClient.GetStream());
         var response = await _commands.ReadResponseAsync();
 
-        var (statusCode, description) = GetStatusCodeAndMessage(response);
+        var (statusCode, description) = FtpStatusCodes.GetStatusCodeAndMessage(response);
         return new(statusCode, description);
     }
 
@@ -39,12 +38,13 @@ public class FtpClient(IFtpCommand _commands, IFtpDataTransfer _ftpDataTransfer)
         _commands.SendCommand($"PASS {_auth.Password}");
         string response = await _commands.ReadResponseAsync();
 
-        var (statusCode, description) = GetStatusCodeAndMessage(response);
+        var (statusCode, description) = FtpStatusCodes.GetStatusCodeAndMessage(response);
 
         if (FtpStatusCodes.IsAuthenticatedStatusCode(statusCode))
         {
             isLogin = true;
         }
+
         return new(statusCode, description);
     }
 
@@ -53,31 +53,23 @@ public class FtpClient(IFtpCommand _commands, IFtpDataTransfer _ftpDataTransfer)
         if (!isLogin)
             throw new FtpAuthenticationException("User not login");
 
-        var (ip, port) = await GetPasiveConnection();
-        return await _ftpDataTransfer.GetFilesAsync(path, ip, port);
+        await CreatePasiveConnection();
+
+        return await _ftpDataTransfer.GetFilesAsync(path);
     }
 
-    private async Task<(string ip, int port)> GetPasiveConnection()
+    public async Task DownloadAsync(string localPath, string remotePath)
+    {
+        await CreatePasiveConnection();
+        await _ftpDataTransfer.DownloadFileAsync(localPath, remotePath);
+    }
+    private async Task CreatePasiveConnection()
     {
         _commands.SendCommand("PASV");
         string response = await _commands.ReadResponseAsync();
-        return FtpResponseParser.ParsePasiveResponse(response);
+        var (ip, port) = FtpResponseParser.ParsePasiveResponse(response);
+        await _ftpDataTransfer.CreateDataClient(ip, port);
     }
-
-    private static (int statusCode, string description) GetStatusCodeAndMessage(string response)
-    {
-        if (response.Length < 3)
-            throw new InvalidOperationException("Invalid FTP response format.");
-
-        if (int.TryParse(response.AsSpan(0, 3), out int statusCode))
-        {
-            string message = FtpStatusCodes.GetStatusCodeDescription(statusCode);
-            return (statusCode, message);
-        }
-
-        throw new InvalidOperationException("Invalid FTP response format.");
-    }
-
     public void Dispose()
     {
         Dispose(true);
