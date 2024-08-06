@@ -1,4 +1,5 @@
 ﻿using Red.FTP.Interfaces;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 
@@ -7,14 +8,25 @@ namespace Red.FTP.Modules;
 internal class FtpCommands : IFtpCommand
 {
     private bool _disposed = false;
-    private NetworkStream? ControlStream { get; set; }
+    private NetworkStream? _controlStream;
+    private SslStream? _controlSslStream;
 
     public void SetNetworkStream(NetworkStream stream)
-        => ControlStream = stream;
-
-    public async Task<string> ReadResponseAsync()
     {
-        ArgumentNullException.ThrowIfNull(ControlStream);
+        _controlStream = stream;
+        _controlSslStream = null;
+    }
+
+    public void SetNetworkStream(SslStream stream)
+    {
+        _controlSslStream = stream;
+        _controlStream = null;
+    }
+
+    public async Task<string> ReadResponseAsync(CancellationToken cancellationToken = default)
+    {
+        if (_controlStream == null && _controlSslStream == null)
+            throw new InvalidOperationException("Control stream is not set");
 
         StringBuilder response = new();
         byte[] buffer = new byte[1024];
@@ -22,17 +34,31 @@ internal class FtpCommands : IFtpCommand
 
         do
         {
-            bytesRead = await ControlStream.ReadAsync(buffer);
+            if (_controlStream != null)
+                bytesRead = await _controlStream.ReadAsync(buffer.AsMemory(), cancellationToken);
+            else
+                bytesRead = await _controlSslStream!.ReadAsync(buffer.AsMemory(), cancellationToken);
+
             response.Append(Encoding.ASCII.GetString(buffer, 0, bytesRead));
+
+            cancellationToken.ThrowIfCancellationRequested();
         } while (bytesRead > 0 && !response.ToString().EndsWith("\r\n"));
 
         return response.ToString();
     }
+
     public void SendCommand(string command)
     {
         byte[] data = Encoding.ASCII.GetBytes($"{command}\r\n");
-        ControlStream?.Write(data, 0, data.Length);
+
+        if (_controlStream != null)
+            _controlStream.Write(data, 0, data.Length);
+        else if (_controlSslStream != null)
+            _controlSslStream.Write(data, 0, data.Length);
+        else
+            throw new InvalidOperationException("Control stream is not set");
     }
+
     public void Dispose()
     {
         Dispose(true);
@@ -45,11 +71,10 @@ internal class FtpCommands : IFtpCommand
         {
             if (disposing)
             {
-                ControlStream?.Dispose();
+                _controlStream?.Dispose();
+                _controlSslStream?.Dispose();
             }
             _disposed = true;
         }
     }
-
-
 }

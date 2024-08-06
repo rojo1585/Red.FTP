@@ -1,6 +1,6 @@
 ﻿namespace Red.FTP.Exceptions;
 
-internal class FileNotFoundException : Exception
+public class FileNotFoundException : Exception
 {
     public FileNotFoundException() { }
 
