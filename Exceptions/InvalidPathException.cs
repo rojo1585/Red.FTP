@@ -1,5 +1,5 @@
 ﻿namespace Red.FTP.Exceptions;
-internal class InvalidPathException : Exception
+public class InvalidPathException : Exception
 {
     public InvalidPathException() { }
 

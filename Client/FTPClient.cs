@@ -74,6 +74,11 @@ public class FtpClient(IFtpCommand commands, IFtpFileTransfer ftpDataTransfer, I
         using var stream = await _passiveConnection.CreateConnectionAsync(cancellationToken);
         await _ftpDataTransfer.DownloadFileAsync(stream, localPath, remotePath, cancellationToken);
     }
+    public async Task UploadFileAsync(string localPath, string remotePath, CancellationToken cancellationToken = default)
+    {
+        using var stream = await _passiveConnection.CreateConnectionAsync(cancellationToken);
+        await _ftpDataTransfer.UploadFileAsync(stream, localPath, remotePath, cancellationToken);
+    }
 
     public void Dispose()
     {

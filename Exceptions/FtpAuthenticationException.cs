@@ -1,6 +1,6 @@
 ﻿namespace Red.FTP.Exemptions;
 
-internal class FtpAuthenticationException : Exception
+public class FtpAuthenticationException : Exception
 {
     public FtpAuthenticationException() { }
 

@@ -72,6 +72,38 @@ internal static class FtpStatusCodes
         FtpStatusCode.SecurityDataExchangeComplete,
         FtpStatusCode.SecurityDataExchangeCompletedSuccessfully
     ];
+
+    private static HashSet<FtpStatusCode> FtpErrorCodes = new HashSet<FtpStatusCode>
+        {
+            // 4xx: Transient Negative Completion reply
+            FtpStatusCode.ServiceNotAvailable,
+            FtpStatusCode.CannotOpenDataConnection,
+            FtpStatusCode.ConnectionClosedTransferAborted,
+            FtpStatusCode.NeedUnavailableResource,
+            FtpStatusCode.RequestedFileActionNotTaken,
+            FtpStatusCode.RequestedActionAbortedLocalError,
+            FtpStatusCode.RequestedActionNotTakenInsufficientStorage,
+
+            // 5xx: Permanent Negative Completion reply
+            FtpStatusCode.SyntaxErrorCommandUnrecognized,
+            FtpStatusCode.SyntaxErrorInParametersOrArguments,
+            FtpStatusCode.CommandNotImplemented,
+            FtpStatusCode.BadSequenceOfCommands,
+            FtpStatusCode.CommandNotImplementedForParameter,
+            FtpStatusCode.DataConnectionCannotBeOpened,
+            FtpStatusCode.ServerDoesNotSupportRequestedProtocol,
+            FtpStatusCode.NotLoggedIn,
+            FtpStatusCode.NeedAccountForStoringFiles,
+            FtpStatusCode.CommandProtectionLevelDenied,
+            FtpStatusCode.RequestDeniedForPolicyReasons,
+            FtpStatusCode.FailedSecurityCheck,
+            FtpStatusCode.RequestedProtectionLevelNotSupported,
+            FtpStatusCode.CommandProtectionLevelNotSupported,
+            FtpStatusCode.RequestedActionNotTakenFileUnavailable,
+            FtpStatusCode.RequestedActionAbortedPageTypeUnknown,
+            FtpStatusCode.RequestedFileActionAbortedExceededStorage,
+            FtpStatusCode.RequestedActionNotTakenFileNameNotAllowed
+        };
     public static string GetStatusCodeDescription(int statusCode)
     {
         if (_statusCodes.TryGetValue((FtpStatusCode)statusCode, out string? description))
@@ -80,10 +112,12 @@ internal static class FtpStatusCodes
         }
         return "Unknown status code";
     }
-    public static bool IsAuthenticatedStatusCode(int statusCode)
-    {
-        return AuthenticatedStatusCodes.Contains((FtpStatusCode)statusCode);
-    }
+    public static bool IsAuthenticatedStatusCode(int statusCode) =>
+        AuthenticatedStatusCodes.Contains((FtpStatusCode)statusCode);
+    public static bool IsFtpError(int statusCode) =>
+        FtpErrorCodes.Contains((FtpStatusCode)statusCode);
+
+
     public static (int statusCode, string description) GetStatusCodeAndMessage(string response)
     {
         if (response.Length < 3)

@@ -7,4 +7,5 @@ public interface IFtpFileTransfer
 {
     Task<IEnumerable<FtpFile>> GetFilesAsync(NetworkStream stream, string remotePath, CancellationToken cancellationToken = default);
     Task DownloadFileAsync(NetworkStream stream, string localPath, string remoteFile, CancellationToken cancellationToken = default);
+    Task<int> UploadFileAsync(NetworkStream stream, string localPath, string remotePath, CancellationToken cancellationToken = default);
 }
