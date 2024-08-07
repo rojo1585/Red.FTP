@@ -9,17 +9,48 @@ Red.FTP is a .NET library for easy and secure FTP connections, including support
 - Task cancellation handling with `CancellationToken`
 - Sending and receiving FTP commands
 
-static async Task Main(string[] args)
-    {
-        var ftpClient = new FtpClient("ftp.example.com", 21);
-        ftpClient.SetCredentials("username", "password");
+## Example
 
-        // Connect to the FTP server
-        await ftpClient.ConnectAsync();
+### Login
+<sup>
+            //Create Client whit default config
+            var client = FtpClientFactory.CreateTcpClient();
+            var conn = await client.CreateConnectionAsync("SRVLMM001.LAMARINA.MX");
+            
+            //Authentication
+            client.SetCredentials("FtpUSer", "YDa5tW9AL");
+            var auth = await client.AuthAsync();
+</sup>
 
-        // Authenticate
-        var cancellationToken = new CancellationTokenSource().Token;
-        var response = await ftpClient.AuthenticateAsync(cancellationToken);
+### Get Files List
+<sup>
 
-        Console.WriteLine($"Authentication Response: {response.Description}");
-    }
+            var cancelationToken = new CancellationTokenSource();
+            cancelationToken.CancelAfter(TimeSpan.FromSeconds(100));
+            string remotePath = "/"
+
+            var file = await client.GetFilesAsync(remotePath, cancelationToken.Token);
+</sup>
+
+### Download file
+<sup>
+
+            var cancelationToken = new CancellationTokenSource();
+            cancelationToken.CancelAfter(TimeSpan.FromSeconds(100));
+            string remotePath = "/"
+            string localPath = "C:"
+
+            var file = await client.GetFilesAsync(localPath, remotePath,cancelationToken.Token);
+</sup>
+
+###
+### Upload file
+<sup>
+
+            var cancelationToken = new CancellationTokenSource();
+            cancelationToken.CancelAfter(TimeSpan.FromSeconds(100));
+            string localFile = "c:/test.zip"
+            string remotePath = "/"
+
+            var file = await client.GetFilesAsync(localPath, remotePath, cancelationToken.Token);
+</sup>
