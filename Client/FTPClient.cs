@@ -98,7 +98,6 @@ public class FtpClient(IFtpCommand commands, IFtpFileTransfer ftpDataTransfer, I
             _disposed = true;
         }
     }
-
     private static bool ValidateServerCertificate(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
     {
         return sslPolicyErrors == SslPolicyErrors.None;

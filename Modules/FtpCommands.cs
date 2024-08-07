@@ -35,7 +35,7 @@ internal class FtpCommands : IFtpCommand
         do
         {
             if (_controlStream != null)
-                bytesRead = await _controlStream.ReadAsync(buffer.AsMemory(), cancellationToken);
+                bytesRead = await _controlStream.ReadAsync(buffer, cancellationToken);
             else
                 bytesRead = await _controlSslStream!.ReadAsync(buffer.AsMemory(), cancellationToken);
 

@@ -1,6 +1,5 @@
 ﻿using Red.FTP.Helpers;
 using Red.FTP.Interfaces;
-using Red.FTP.Models;
 using System.Net.Sockets;
 
 namespace Red.FTP.Handler;
@@ -20,11 +19,6 @@ internal class FtpPassiveConnection(IFtpCommand commands) : IConnection
     {
         passiveClient = new();
         await passiveClient.ConnectAsync(ip, port, cancellationToken);
-
-        var (statusCode, description) = Handler.FtpStatusCodes.GetStatusCodeAndMessage(await commands.ReadResponseAsync(cancellationToken));
-        if (statusCode != (int)Literals.FtpStatusCode.EnteringPassiveMode)
-            throw new InvalidOperationException($"Error while entering passive mode: {description}");
-
         return passiveClient.GetStream();
     }
 

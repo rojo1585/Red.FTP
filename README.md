@@ -15,10 +15,10 @@ Red.FTP is a .NET library for easy and secure FTP connections, including support
 <sup>
             //Create Client whit default config
             var client = FtpClientFactory.CreateTcpClient();
-            var conn = await client.CreateConnectionAsync("SRVLMM001.LAMARINA.MX");
+            var conn = await client.CreateConnectionAsync("Host");
             
             //Authentication
-            client.SetCredentials("FtpUSer", "YDa5tW9AL");
+            client.SetCredentials("FtpUSer", "FtpPassword");
             var auth = await client.AuthAsync();
 </sup>
 
